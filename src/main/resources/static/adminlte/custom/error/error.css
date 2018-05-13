@@ -1,0 +1,22 @@
+.error-heading, .error-desc, .error-back {
+	text-shadow: 0 1px 0 #ededed;
+	text-align: center;
+	margin: 40px 0;
+	color: #292929;
+}
+.error-heading { 
+	font-size: 160px; 
+	text-shadow: 0 2px 4px #ededed; 
+}
+.error-desc { 
+	font-size: 20px; 
+	font-weight: 600; 
+}
+.error-back { 
+	font-size: 14px; 
+	font-weight: 600; 
+}
+.error-back a { 
+	color: #3C8DBC; 
+	text-decoration:none;
+}

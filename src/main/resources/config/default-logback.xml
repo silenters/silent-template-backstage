@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="TRUE">
+
+	<appender name="A1" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/service.log</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d{MM-dd-HH:mm:ss.SSS}] [%-5.5level] - %-25.25file[%-4.4line] %msg%n</pattern>
+		</layout>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/history/service.log.%i</FileNamePattern>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>50MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<appender name="A2" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d{MM-dd-HH:mm:ss.SSS}] [%-5.5level] - %-25.25file[%-4.4line] %-15.-500msg%n</pattern>
+		</layout>
+	</appender>
+	
+	<appender name="A3" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/datacenter.log</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d{MM-dd-HH:mm:ss.SSS}] [%-5.5level] - %-25.25file[%-4.4line] %msg%n</pattern>
+		</layout>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/history/datacenter.log.%i</FileNamePattern>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>50MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	
+	<logger name="com.mimo.connector.datacenter" level="INFO" additivity="false">
+		<appender-ref ref="A3" />
+	</logger>
+	
+	<appender name="A4" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/utils.log</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d{MM-dd-HH:mm:ss.SSS}] [%-5.5level] - %-25.25file[%-4.4line] %msg%n</pattern>
+		</layout>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/history/utils.log.%i</FileNamePattern>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>50MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<logger name="com.mimo.utils" level="INFO" additivity="false">
+		<appender-ref ref="A4" />
+	</logger>
+	<appender name="A5" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/connector.log</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d{MM-dd-HH:mm:ss.SSS}] [%-5.5level] - %-25.25file[%-4.4line] %msg%n</pattern>
+		</layout>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/history/connector.log.%i</FileNamePattern>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>50MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<logger name="com.mimo.connector" level="INFO" additivity="false">
+		<appender-ref ref="A5" />
+	</logger>
+	
+	<appender name="A6" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/history/tmp.log</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d{MM-dd-HH:mm:ss.SSS}] [%-5.5level] - %-25.25file[%-4.4line] %msg%n</pattern>
+		</layout>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/history/tmp.log.%i</FileNamePattern>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>50MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	<logger name="null.null.null" level="INFO" additivity="false">
+		<appender-ref ref="A6" />
+	</logger>
+	<appender name="A7" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>logs/jetty.log</File>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>[%d{MM-dd-HH:mm:ss.SSS}] [%-5.5level] -%-25.25file[%-4.4line] %msg%n</pattern>
+		</layout>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>logs/history/jetty.log.%i</FileNamePattern>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>50MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+	<logger name="org.mortbay" level="debug" additivity="true">
+		<appender-ref ref="A7" />
+	</logger>
+
+	<root level="INFO">
+		<appender-ref ref="A2" />
+	</root>
+</configuration>

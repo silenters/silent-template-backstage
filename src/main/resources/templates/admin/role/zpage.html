@@ -1,0 +1,43 @@
+<button type="button" onclick="saveRolePage()" class="btn btn-primary"><@spring.message 'common.save'/></button>
+<div class="content_wrap">
+    <div class="left">
+        <ul id="pageTree" class="ztree"></ul>
+    </div>
+</div>
+<script type="text/javascript">
+//zTree配置
+var setting = {
+	check : {
+		enable : true
+	},
+	data : {
+		simpleData : {
+			enable : true
+		}
+	}
+};
+
+var zNodes = '${(nodes)!}';
+var treeObj =$.fn.zTree.init($("#pageTree"), setting, zNodes);
+treeObj.expandAll(true);
+
+/**
+ * 保存角色及对应页面信息
+ */
+function saveRolePage(){
+	nodes = treeObj.getCheckedNodes(true);
+	var pageIds = new Array(); 
+    for(var i = 0; i < nodes.length; i++){
+    	pageIds[i] = nodes[i].id;
+    }
+    
+    var sendData = {pageIds: pageIds.join(","), roleId: "${(bean.id)!}"};
+    ajaxGet('${(currentPage.url)!}/rolepage', sendData, function(response) {
+    	if (response.code == 0) {
+			zeroModal.success(response.msg);
+		} else {
+			zeroModal.error(response.msg);
+		}
+    });
+}
+</script>

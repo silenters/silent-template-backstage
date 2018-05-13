@@ -1,0 +1,131 @@
+<div class="row">
+	<div class="col-md-6">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title"></h3>
+			</div>
+			<form class="form-horizontal" id="saveForm" method="post" action="${(currentPage.url)!}/save">
+				<div class="box-body">
+					<!-- ID -->
+					<#if (bean.id)?? && (bean.id != "")>
+						<div class="form-group">
+							<label data-name="id" class="col-sm-3 control-label"><@spring.message 'common.id'/></label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="id" name="id" value="${(bean.id)!}" readonly placeholder="<@spring.message 'common.id'/>">
+							</div>
+						</div>
+					</#if>
+					
+					<!-- login name -->
+					<div class="form-group">
+						<label data-name="username" class="col-sm-3 control-label"><@spring.message 'login.username'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="username" name="username" value="${(bean.username)!}" placeholder="<@spring.message 'login.username'/>">
+						</div>
+					</div>
+					
+					<!-- password -->
+					<div class="form-group">
+						<label data-name="password" class="col-sm-3 control-label"><@spring.message 'login.password'/></label>
+						<#if (bean.id)?? && (bean.id != "")>
+							<div class="col-sm-6">
+								<input type="password" class="form-control" id="password" name="password" value="${(bean.password)!}" readonly>
+							</div>
+							<div class="col-sm-3">
+								<button type="button" data-id="${(bean.id)!}" onclick="resetPass(this)" class="btn btn-danger"><@spring.message 'common.reset.password'/></button>
+							</div>
+						<#else>
+							<div class="col-sm-9">
+								<input type="password" class="form-control" id="password" name="password" value="${(bean.password)!}" placeholder="<@spring.message 'login.password'/>">
+							</div>
+						</#if>
+					</div>
+					
+					<!-- realname -->
+					<div class="form-group">
+						<label data-name="realname" class="col-sm-3 control-label"><@spring.message 'user.realname'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="realname" name="realname" value="${(bean.realname)!}" placeholder="<@spring.message 'user.realname'/>">
+						</div>
+					</div>
+					
+					<!-- job -->
+					<div class="form-group">
+						<label data-name="job" class="col-sm-3 control-label"><@spring.message 'user.job'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="job" name="job" value="${(bean.job)!}" placeholder="<@spring.message 'user.job'/>">
+						</div>
+					</div>
+					
+					<!-- company -->
+					<div class="form-group">
+						<label data-name="company" class="col-sm-3 control-label"><@spring.message 'user.company'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="company" name="company" value="${(bean.company)!}" placeholder="<@spring.message 'user.company'/>">
+						</div>
+					</div>
+					
+					<!-- enable -->
+					<div class="form-group">
+						<label data-name="enable" class="col-sm-3 control-label"><@spring.message 'common.status'/></label>
+						<div class="col-sm-9">
+							<select class="form-control select2" style="width: 100%;" id="status" name="status">
+								<option value="1" <#if (bean.status)?? && ((bean.status) == 1)>selected="selected"</#if>><@spring.message 'status.enable'/></option>
+								<option value="0" <#if (bean.status)?? && ((bean.status) == 0)>selected="selected"</#if>><@spring.message 'status.disable'/></option>
+							</select>
+						</div>
+					</div>
+					
+					<!-- TIME -->
+					<#if (bean.id)?? && (bean.id != "")>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><@spring.message 'common.updatetime'/></label>
+							<div class="col-sm-9">
+								<span class="form-control" id="updatetime"><script>document.write(timeToString(${(bean.time)?c}));</script></span>
+							</div>
+						</div>
+					</#if>
+				</div>
+				<div class="box-footer">
+					<#if (currentPage.parentPageUrl)??>
+						<a href="${(currentPage.parentPageUrl)!}" class="btn btn-default"><@spring.message 'common.return'/></a>
+					</#if>
+					<button type="button" onclick="saveUser()" class="btn btn-primary pull-right"><@spring.message 'common.save'/></button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- 权限角色 -->
+	<#if (bean.id)?? && (bean.id != "")>
+		<div class="col-md-3">
+			<#include "user-role.html">
+		</div>
+	</#if>
+</div>
+<script type="text/javascript" language="javascript">
+function saveUser() {
+	ajaxSubmitForm("#saveForm", function(response) {
+		if(response.code == 0) {
+			zeroModal.success(response.msg);
+			if(isFalse("${(bean.id)!}")) {
+				delayRedirectPage("${(currentPage.parentPageUrl)!}");
+			}
+		} else {
+			zeroModal.error(response.msg);
+		}
+	});
+}
+
+function resetPass(object) {
+	zeroModal.loading(2);
+	ajaxPost('${(currentPage.url)!}/resetpass', {"id": $(object).attr("data-id")}, function(response) {
+		zeroModal.closeAll();
+  		if (response.code == 0) {
+  			zeroModal.success(response.msg);
+  			$("#password").val(response.data);
+  		} else {
+  			zeroModal.error(response.msg);
+  		}
+	});
+}
+</script>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base id="base" href="${project_context_path!}">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<title><@spring.message code='common.logo'/> <@spring.message code='common.title'/></title>
+<link rel="stylesheet" type="text/css" href="${template_url_cdn!}adminlte/login/login.css"/>
+<style>
+body {
+	background: url(${template_url_cdn!}${login_background_image!});
+}
+.btn-login-custom{
+	background-color: ${login_button_color!}!important;
+	border-color: ${login_button_color!}!important;
+}
+
+</style>
+</head>
+<body>
+<div id="wrapper" class="login-page">
+	<div class="login-logo">
+		<b style="color: white;"><@spring.message 'common.logo'/> <@spring.message 'common.title'/></b>
+	</div>
+	<div id="login_form" class="form">
+		<form class="login-form" action="login" method="post">
+	    	<input type="text" id="username" name="username" placeholder="<@spring.message 'login.username'/>" value="${username!}"/>
+	    	<input type="password" id="password" name="password" placeholder="<@spring.message 'login.password'/>" />
+	    	<input type="hidden" name="v_op" value="login" />
+	    	<button id="login" type="submit" class="btn-login-custom"><@spring.message 'login.login'/></button>
+	  	</form>
+	</div>
+	<div class="lockscreen-footer text-center">
+		<div class="copyright" id="copyright"><@spring.message 'common.footer.copyright'/></div>
+	</div>
+</div>
+<script type="text/javascript" src="${template_url_cdn!}adminlte/jquery/jQuery-2.1.4.min.js"></script>
+<script type="text/javascript">
+var message = '${msg!}'
+if(message) {
+	var username = $("#username").val();
+	if(username) {
+		$("#password").val("").attr("placeholder", message);
+	} else {
+		$("#username").val("").attr("placeholder", message);
+	}
+	$("#login_form").removeClass('shake_effect');
+	setTimeout(function() {
+		$("#login_form").addClass('shake_effect')
+	}, 1);
+}
+</script>
+</body>
+</html>

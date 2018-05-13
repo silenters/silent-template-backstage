@@ -1,0 +1,23 @@
+<body class="skin-blue sidebar-mini ${body_class!}">
+	<div class="wrapper">
+		<#include "include/style_1/header.html">
+		<#include "include/style_1/main-sidebar-left.html">
+		<div class="content-wrapper">
+			<#if (view.page)??>
+				<section class="content-header">
+					<h1>
+						${(view.title)!}<small>${(view.desc)!}</small>
+					</h1>
+					<ol class="breadcrumb">
+						<li><a href="${backstage_index!}"><i class="fa fa-dashboard"></i> <@spring.message 'common.index'/></a></li>
+						<li class="active">${(view.title)!}</li>
+					</ol>
+				</section>
+				<section class="content">
+					<#include "${(view.page)!}">
+				</section>
+			</#if>
+		</div>
+		<#include "include/main-footer.html">
+	</div>
+</body>

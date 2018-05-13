@@ -1,0 +1,40 @@
+@CHARSET "UTF-8";
+
+PRE.CodeContainer {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+PRE.CodeContainer img {
+	cursor: pointer;
+	border: none;
+	margin-bottom: -1px;
+}
+
+.Canvas {
+	font-family: Lucida Console, Georgia;
+	font-size: 13px;
+	background-color: #FFFFFF;
+	color: #000000;
+	border: solid 1px #FFFFFF;
+}
+
+.PropertyName {
+	color: #CC0000;
+	font-weight: bold;
+}
+
+.Comma {
+	color: #000000;
+	font-weight: bold;
+}
+
+.ArrayBrace {
+	color: #0033FF;
+	font-weight: bold;
+}
+
+.ObjectBrace {
+	color: #00AA00;
+	font-weight: bold;
+}

@@ -1,0 +1,52 @@
+<!-- 权限角色 -->
+<div class="box box-primary">
+	<div class="box-header with-border">
+		<h3 class="box-title"><@spring.message 'common.role.title'/></h3>
+	</div>
+	<div class="box-body">
+		<table id="data-tb" class="table table-bordered">
+			<#if list??>
+				<#list list as item>
+					<tr>
+						<td>
+							<label>
+								<input type="checkbox" value="${(item.id)!}" name="role_id" <#if map[((item.id)?string)!'']??>checked</#if>/>&nbsp;&nbsp;&nbsp;${(item.name)!}
+							</label>
+						</td>
+					</tr>
+				</#list>
+			</#if>
+		</table>
+		<div class="box-footer">
+			<span id="role_msg"></span>
+			<button type="submit" onclick="saveRole()" class="btn btn-primary pull-right"><@spring.message 'common.save'/></button>
+		</div>
+	</div>
+	<div id="loading_overlay" class="overlay" style="display: none;">
+    	<i class="fa fa-refresh fa-spin"></i>
+    </div>
+</div>
+<script type="text/javascript">
+function saveRole() {
+	zeroModal.loading(2);
+	var str = $("[name = role_id]:checkbox");
+	var roles = '';
+	for (var i = 0; i < str.length; i++){
+	    if(str[i].checked == true){
+	    	roles += str[i].value+",";
+        }
+	}
+	if(roles.length > 0) {
+		roles = roles.substring(0, roles.length-1);
+	}
+	var sendData = {"roles":roles,"user_id":'${bean.id}'}
+	ajaxPost('${(currentPage.url)!}/saverole', sendData, function(response) {
+		zeroModal.closeAll();
+		if (response.code == 0) {
+			zeroModal.success(response.msg);
+		} else {
+			zeroModal.error(response.msg);
+		}
+	});
+}
+</script>

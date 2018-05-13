@@ -1,0 +1,41 @@
+/* 顶部导航栏及用户设置背景色 */
+li.user-header, nav.navbar, .main-header, .logo {
+	background-color: #294f6f!important;
+}
+
+/*左侧导航栏时，顶部三条杠鼠标滑过背景色*/
+.sidebar-toggle:hover {
+	background-color: #294f6f!important;
+}
+
+/*左侧导航栏时，鼠标滑过导航栏左侧条形背景色*/
+.skin-blue .sidebar-menu>li:hover>a, .skin-blue .sidebar-menu>li.active>a {
+	border-left-color: #5e747d!important;
+}
+
+/*表格顶部条形背景色*/
+.box {
+	border-top-color: #2e73ad!important;
+}
+
+/*活跃li顶部条形背景色*/
+.nav-tabs-custom>.nav-tabs>li.active {
+	border-top-color: #2e73ad!important;
+}
+
+/*默认按钮背景色*/
+.btn-primary {
+	background-color: #316692!important;
+	border-color: #316692!important;
+}
+
+/*表格分页背景色*/
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover{
+	background-color: #316692;
+    border-color: #316692;
+}
+
+/*label条形块背景色*/
+.bg-light-blue, .label-primary, .modal-primary .modal-body{
+	background-color: #2778a7 !important;
+}

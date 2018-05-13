@@ -1,0 +1,69 @@
+<div class="row">
+	<div class="col-md-4">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title"></h3>
+			</div>
+			<form class="form-horizontal" id="saveForm" method="post" action="${(currentPage.url)!}/save">
+				<div class="box-body">
+					<!-- ID -->
+					<#if (bean.id)?? && (bean.id != "")>
+						<div class="form-group">
+							<label data-name="id" class="col-sm-3 control-label"><@spring.message 'common.id'/></label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="id" name="id" value="${(bean.id)!}" readonly placeholder="<@spring.message 'common.id'/>">
+							</div>
+						</div>
+					</#if>
+					
+					<!-- Name -->
+					<div class="form-group">
+						<label data-name="name" class="col-sm-3 control-label"><@spring.message 'common.name'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="name" name="name" value="${(bean.name)!}" placeholder="<@spring.message 'common.name'/>">
+						</div>
+					</div>
+					
+					<!-- Description -->
+					<div class="form-group">
+						<label data-name="description" class="col-sm-3 control-label"><@spring.message 'common.description'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="description" name="description" value="${(bean.description)!}" placeholder="<@spring.message 'common.description'/>">
+						</div>
+					</div>
+					
+					<!-- Time -->
+					<#if (bean.id)?? && (bean.id != "")>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><@spring.message 'common.updatetime'/></label>
+							<div class="col-sm-9">
+								<span class="form-control" id="updatetime"><script>document.write(timeToString(${(bean.time)?c}));</script></span>
+							</div>
+						</div>
+					</#if>
+				</div>
+				<div class="box-footer">
+					<#if (currentPage.parentPageUrl)??>
+						<a href="${(currentPage.parentPageUrl)!}" class="btn btn-default"><@spring.message 'common.return'/></a>
+					</#if>
+					<button type="button" onclick="saveRole()" class="btn btn-primary pull-right"><@spring.message 'common.save'/></button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<#if (bean.id)?? && (bean.id != "")>
+		<div class="col-md-6">
+			<#include "zpage.html">
+		</div>
+	</#if>
+</div>
+<script type="text/javascript" language="javascript">
+function saveRole() {
+	ajaxSubmitForm("#saveForm", function(response) {
+		zeroModal.success(response.msg);
+		if(isFalse("${(bean.id)!}")) {
+			delayRedirectPage("${(currentPage.parentPageUrl)!}");
+		}
+	});
+}
+</script>

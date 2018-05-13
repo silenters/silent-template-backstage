@@ -1,0 +1,66 @@
+<aside class="main-sidebar">
+	<section class="sidebar">
+		<!-- 用户区域 -->
+		<div class="user-panel">
+			<div class="pull-left image">
+				<#if (user.headimage)?? && user.headimage != "">
+					<img src="${(user.headimage)!}" class="img-circle" alt="<@spring.message 'common.head.portrait'/>" />
+				<#else>					
+					<img src="${template_url_cdn!}adminlte/dist/img/user2-160x160.jpg" class="img-circle" alt="<@spring.message 'common.head.portrait'/>" />
+				</#if>
+			</div>
+			<div class="pull-left info">
+				<p>${(user.realname)!}</p>
+				<a href="javascript:void(0);">
+					<i class="fa fa-circle text-success"></i><@spring.message 'common.online'/>
+				</a>
+			</div>
+		</div>
+		<ul class="sidebar-menu">
+			<li class="header"><@spring.message 'common.main.nav'/></li>
+			<#if pageList??>
+				<#list pageList as page>
+					<!-- 一级导航 -->
+					<li class="treeview <#if (currentPageMap[((page.id)?string)!''])??>active</#if>">
+						<a href="<#if (page.url)?? && (page.url) != ''>${(page.url)!}<#else>javascript:void(0);</#if>"> 
+							<i class="fa <#if ((page.icon)?? && page.icon != '')>${page.icon}<#else>fa-laptop</#if>"></i>
+							<span>${(page.name)!}</span> 
+							<#if (page.childList)?? && ((page.url)!'') == ''>
+								<i class="fa fa-angle-left pull-right"></i>
+							</#if>
+						</a>
+						
+						<!-- 二级导航 -->
+						<#if (page.childList)?? && ((page.url)!'') == ''>
+							<ul class="treeview-menu">
+								<#list page.childList as childPage>
+									<li class="<#if (currentPageMap[((childPage.id)?string)!''])??>active</#if>">
+										<a href="${(childPage.url)!}">
+											<i class="fa fa-circle-o"></i> ${(childPage.name)!}
+											<#if (childPage.childList)?? && ((childPage.url)!'') == ''>
+												<i class="fa fa-angle-left pull-right"></i>
+											</#if>
+										</a>
+										
+										<!-- 三级导航 -->
+										<#if (childPage.childList)??  && ((childPage.url)!'') == ''>
+											<ul class="treeview-menu">
+												<#list childPage.childList as thirdPage>
+													<li class="<#if (currentPageMap[((thirdPage.id)?string)!''])??>active</#if>">
+														<a href="${(thirdPage.url)!}">
+															<i class="fa fa-circle-o"></i>${(thirdPage.name)!}
+														</a>
+													</li>
+												</#list>
+											</ul>
+										</#if>
+									</li>
+								</#list>
+							</ul>
+						</#if>
+					</li>
+				</#list>
+			</#if>
+		</ul>
+	</section>
+</aside>

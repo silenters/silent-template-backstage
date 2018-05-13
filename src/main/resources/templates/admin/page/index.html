@@ -1,0 +1,365 @@
+<div class="row">
+	<div class="col-md-4">
+		<div class="content_wrap">
+		    <div class="left">
+		        <ul id="pageTree" class="ztree"></ul>
+		    </div>
+		</div>
+	</div>
+	<div class="col-md-6 editDiv" style="display:none;">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+				<h3 class="box-title"><@spring.message 'common.edit.page'/></h3>
+			</div>
+			<form class="form-horizontal" id="pageForm" method="post">
+				<div class="box-body">
+					<!-- ID -->
+					<div class="form-group visible-status">
+						<label data-name="id" class="col-sm-3 control-label"><@spring.message 'common.id'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="id" name="id" value="" readonly placeholder="<@spring.message 'common.id'/>">
+						</div>
+					</div>
+					
+					<!-- NAME -->
+					<div class="form-group">
+						<label data-name="name" class="col-sm-3 control-label"><@spring.message 'common.name'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="name" name="name" value="" placeholder="<@spring.message 'common.name'/>">
+						</div>
+					</div>
+					
+					<!-- URL -->
+					<div class="form-group">
+						<label data-name="url" class="col-sm-3 control-label">URL</label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="url" name="url" value="" placeholder="URL">
+						</div>
+					</div>
+					
+					<!-- PARENT_ID -->
+					<div class="form-group">
+						<label data-name="parent_id" class="col-sm-3 control-label"><@spring.message 'common.parent.menu'/></label>
+						<div class="col-sm-9">
+							<select class="form-control select2" style="width: 100%;" id="parent_id" name="parent_id">
+								<option value=""><@spring.message 'common.select'/></option>
+								<#if list??>
+									<#list list as item>
+										<option value="${(item.id)!}">${(item.name)!}</option>
+									</#list>
+								</#if>
+							</select>
+						</div>
+					</div>
+					
+					<!-- SEQUENCE -->
+					<div class="form-group">
+						<label data-name="sequence" class="col-sm-3 control-label"><@spring.message 'common.sort'/></label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="sequence" name="sequence" value="" placeholder="<@spring.message 'common.sort.hint'/>">
+						</div>
+					</div>
+					
+					<!-- ENABLE -->
+					<div class="form-group">
+                    	<div class="col-sm-offset-3 col-sm-9">
+                        	<div class="checkbox">
+                          		<label>
+                            		<input type="checkbox" value="1" name="visible" id="visible"/> <@spring.message 'common.is.visible'/>
+                          		</label>
+                        	</div>
+                      	</div>
+                    </div>
+					
+					<!-- TIME -->
+					<div class="form-group visible-status">
+						<label data-name="updatetime" class="col-sm-3 control-label"><@spring.message 'common.updatetime'/></label>
+						<div class="col-sm-9">
+							<span class="form-control" id="updatetime"></span>
+						</div>
+					</div>
+				</div>
+				<div class="box-footer">
+					<button type="button" onclick="doSave()" class="btn btn-primary pull-right"><@spring.message 'common.save'/></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var addUrl = '${childPageMap["add"]!}';
+var editUrl = '${childPageMap["edit"]!}';
+var deleteUrl = '${childPageMap["del"]!}';
+
+$(document).ready(function() {
+	// 获取页面树节点信息
+	$.post('${(currentPage.url)!}/tree', null, function(response) {
+		if (response.code == 0) {
+			$.fn.zTree.init($("#pageTree"), setting, response.data);
+		}
+	});
+});
+
+//默认配置
+var setting = {
+	edit: {
+		drag: {
+			autoExpandTrigger: true,	//设置拖拽时父节点自动展开触发
+			prev: dropPrev,				//设置是否允许移动到目标节点前面
+			inner: dropInner,			//设置是够允许成为目标节点的子节点
+			next: dropNext				//设置是否允许移动到目标节点后面
+		},
+		enable: true,					//设置 zTree 是否处于编辑状态
+		showRemoveBtn: false,			//设置是否显示删除按钮
+		showRenameBtn: false			//设置是否显示编辑名称按钮
+	},
+	data: {
+		simpleData: {
+			enable: true				//是否采用简单数据
+		}
+	},
+	view: {
+        addHoverDom: addHoverDom,			//鼠标移动到节点上时显示自定义控件
+		removeHoverDom: removeHoverDom		//鼠标移出节点时，隐藏用户自定义控件
+    },
+	callback: {
+		beforeDrag: beforeDrag,			//用于捕获节点被拖拽之前的事件回调函数
+		beforeDrop: beforeDrop,			//用于捕获节点拖拽操作结束之前的事件回调函数
+		onDrop: onDrop
+	}
+};
+
+var zNodes = [];  
+var addMode = true;		//是否为保存模式
+
+/**
+ * treeId : 被拖拽的节点 treeNodes 所在 zTree 的 treeId 
+ * treeNodes : 要被拖拽的节点 JSON 数据集合
+ */
+function beforeDrag(treeId, treeNodes) {	
+	for (var i = 0, l = treeNodes.length; i < l; i++) {
+		if (treeNodes[i].drag === false) { 
+			curDragNodes = null;
+			return false;
+		} else if (treeNodes[i].parentTId && treeNodes[i].getParentNode().childDrag === false) {
+			curDragNodes = null;
+			return false;
+		}
+	}
+	curDragNodes = treeNodes;
+	return true;
+}
+		
+var tempDropPid;		//暂存拖到的节点parentId
+/**
+ * treeId : 目标节点 targetNode 所在 zTree 的 treeId
+ * treeNodes : 被拖拽的节点 JSON 数据集合
+ * targetNode : treeNodes 被拖拽放开的目标节点 JSON 数据对象。
+ * moveType : 指定移动到目标节点的相对位置	"inner"：成为子节点，"prev"：成为同级前一个节点，"next"：成为同级后一个节点
+ * isCopy : 拖拽节点操作是 复制 或 移动	true：复制；false：移动
+ */
+function beforeDrop(treeId, treeNodes, targetNode, moveType, isCopy) {
+	if (isCopy == null) {
+		return false;
+	}
+	tempDropPid = treeNodes[0].pId;
+	return true;
+}
+
+/**
+ * treeId : 目标节点 targetNode 所在 zTree 的 treeId
+ * treeNodes : 被拖拽的节点 JSON 数据集合
+ * targetNode : treeNodes 被拖拽放开的目标节点 JSON 数据对象。
+ * moveType : 指定移动到目标节点的相对位置	"inner"：成为子节点，"prev"：成为同级前一个节点，"next"：成为同级后一个节点
+ * isCopy : 拖拽节点操作是 复制 或 移动	true：复制；false：移动
+ */
+function onDrop(event, treeId, treeNodes, targetNode, moveType, isCopy) {
+	if (isCopy == null) {
+		return false;
+	}
+	console.log("drop:[source:"+treeNodes[0].id+"]--->[target:"+targetNode.id+"]");
+	var parentId = treeNodes[0].pId;
+	var parentChange = (parentId != tempDropPid ? true : false);
+	
+	$.ajax({
+   			method : "post",
+   			url : '${(currentPage.url)!}/changeSequence',
+   			data : {
+   				id : treeNodes[0].id,
+   				pId : parentId,
+   				targetNodeId : targetNode.id,
+   				moveType : moveType,
+   				parentChange : parentChange
+   			}
+   		}).done(function(response) {
+   			if (response.code == 0) {
+   				treeNodes[0].name = response.data;
+   				$.fn.zTree.getZTreeObj("pageTree").updateNode(treeNodes[0]);
+   			} 
+   		}).fail(function() {
+   			console.log("请求超时，请重试！");
+   		});
+}
+
+/**
+ * 自定义控件设置
+ */
+function addHoverDom(treeId, treeNode) {
+    var aObj = $("#" + treeNode.tId + "_span");
+    if (treeNode.editNameFlag 
+    		|| $("#addBtn_"+treeNode.id).length > 0 
+    		|| $("#editBtn_"+treeNode.id).length > 0 
+    		|| $("#removeBtn_"+treeNode.id).length > 0) {
+    	return;	
+    }
+	if(editUrl) {
+		var editStr = "<span class='button edit' id='editBtn_" + treeNode.id + "' nodeId='" + treeNode.id + "' title='" + treeNode.name + "' onfocus='this.blur();'></span>";
+		aObj.append(editStr);
+	}
+	if(addUrl) {
+		var addStr = "<span class='button add' id='addBtn_" + treeNode.id + "' nodeId='" + treeNode.id + "' title='" + treeNode.name + "' onfocus='this.blur();'></span>";
+		aObj.append(addStr);
+	}
+	if(deleteUrl) {
+		var removeStr = "<span class='button remove' id='removeBtn_" + treeNode.id + "' nodeId='" + treeNode.id + "' title='" + treeNode.name + "' onfocus='this.blur();'></span>";
+		aObj.append(removeStr);
+	}
+	
+	//编辑
+	var editBtn = $("#editBtn_" + treeNode.id);
+  	if (editBtn) editBtn.bind("click", function() {
+  		addMode=false;
+  		$.post(editUrl, {id:$(this).attr("nodeId")}, function(response) {
+			if (response.code == 0) {
+     			$(".visible-status").show();
+     			$(".editDiv").show();
+     			$("#id").val(response.data.id);
+     			$("#name").val(response.data.name);
+     			$("#url").val(response.data.url);
+  	     		$("#parent_id").val(response.data.parent_id);
+  	      		$(".select2").select2().val(response.data.parent_id).trigger("change");
+   	     		$("#sequence").val(response.data.sequence);
+   	     		$("#visible").prop("checked", response.data.visible == 1 ? true : false);
+   	     		$("#updatetime").html(timeToString(response.data.time));
+   	     		$("#pageForm").attr("action", editUrl + "/save");
+     		}
+		});
+	 });
+  	
+  	//添加
+	var addBtn = $("#addBtn_" + treeNode.id);
+	if (addBtn) addBtn.bind("click", function(){
+		addMode = true;
+		$(".editDiv").show();
+		$(".visible-status").hide();
+		$("#id").val("");
+		$("#name").val("");
+		$("#url").val("");
+		$("#parent_id").val($(this).attr("nodeId"));
+		$(".select2").select2().val($(this).attr("nodeId")).trigger("change");
+   		$("#sequence").val(0);
+   		$("#visible").prop("checked",true);
+   		$("#updatetime").html("");
+   		$("#pageForm").attr("action", addUrl + "/save");
+	});
+	
+	// 删除
+	var reomoveBtn = $("#removeBtn_" + treeNode.id);
+	if (reomoveBtn) reomoveBtn.bind("click", function(){
+		var msg = "您真的确定要删除[" + $(this).attr("title") + "]吗？"; 
+		var id = $(this).attr("nodeId")
+		zeroModal.confirm(msg, function() {
+			$.post(deleteUrl, {id:id}, function(response) {
+				if (response.code == 0) {
+					var treeObj = $.fn.zTree.getZTreeObj("pageTree");
+					var nodes = treeObj.getSelectedNodes();
+					treeObj.removeNode(nodes[0]);
+				} else {
+					zeroModal.error(response.msg);
+				}
+			})
+	    });
+	});
+};
+
+//清除图标
+function removeHoverDom(treeId, treeNode) {
+	$("#addBtn_" + treeNode.id).unbind().remove();
+	$("#editBtn_" + treeNode.id).unbind().remove();
+	$("#removeBtn_" + treeNode.id).unbind().remove();
+};
+
+//保存页面编辑信息
+function doSave() {
+	ajaxSubmitForm("#pageForm", function(response) {
+		if(addMode){
+			var treeObj = $.fn.zTree.getZTreeObj("pageTree");
+			var parentNode = treeObj.getNodeByParam("id", $("#parent_id").val(), null);
+			var aa = response.data.node
+			treeObj.addNodes(parentNode, aa);
+		}
+		zeroModal.success(response.msg);
+		$(".editDiv").hide();
+	});
+}
+
+/**
+ * treeId : 目标节点所在树treeId
+ * nodes : 被拖拽的节点 JSON 数据集合
+ * targetNode : 拖拽时的目标节点 JSON 数据对象
+ */
+function dropPrev(treeId, nodes, targetNode) {
+	var pNode = targetNode.getParentNode();
+	if (pNode && pNode.dropInner === false) {
+		return false;
+	} else {
+		for (var i = 0, l = curDragNodes.length; i < l; i++) {
+			var curPNode = curDragNodes[i].getParentNode();
+			if (curPNode && curPNode !== targetNode.getParentNode() && curPNode.childOuter === false) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+/**
+ * treeId : 目标节点所在树treeId
+ * nodes : 被拖拽的节点 JSON 数据集合
+ * targetNode : 拖拽时的目标节点 JSON 数据对象
+ */
+function dropInner(treeId, nodes, targetNode) {
+	if (targetNode && targetNode.dropInner === false) {
+		return false;
+	} else {
+		for (var i = 0, l = curDragNodes.length; i < l; i++) {
+			if (!targetNode && curDragNodes[i].dropRoot === false) {
+				return false;
+			} else if (curDragNodes[i].parentTId && curDragNodes[i].getParentNode() !== targetNode && curDragNodes[i].getParentNode().childOuter === false) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+	
+/**
+ * treeId : 目标节点所在树treeId
+ * nodes : 被拖拽的节点 JSON 数据集合
+ * targetNode : 拖拽时的目标节点 JSON 数据对象
+ */
+function dropNext(treeId, nodes, targetNode) {
+	var pNode = targetNode.getParentNode();
+	if (pNode && pNode.dropInner === false) {
+		return false;
+	} else {
+		for (var i = 0, l = curDragNodes.length; i < l; i++) {
+			var curPNode = curDragNodes[i].getParentNode();
+			if (curPNode && curPNode !== targetNode.getParentNode() && curPNode.childOuter === false) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+</script>

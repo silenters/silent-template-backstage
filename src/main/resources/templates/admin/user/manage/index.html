@@ -1,0 +1,61 @@
+<#if childPageMap["add"]??>
+	<div class="row col-xs-12">
+		<a href="${childPageMap['add']}" class="btn btn-default"><i class="fa fa-fw fa-plus"></i> <@spring.message 'common.add'/></a>
+	</div>
+	<br><br>
+</#if>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="box box-primary">
+			<div class="box-body">
+				<table id="datatable_nebula" class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th><@spring.message 'common.id'/></th>
+							<th><@spring.message 'login.username'/></th>
+							<th><@spring.message 'user.realname'/></th>
+							<th><@spring.message 'user.company'/></th>
+							<th><@spring.message 'user.job'/></th>
+							<th><@spring.message 'common.status'/></th>
+							<th><@spring.message 'common.updatetime'/></th>
+							<#if childPageMap['edit']?? || childPageMap['del']??>
+								<th data-orderable="false"><@spring.message 'common.operation'/></th>
+							</#if>
+						</tr>
+					</thead>
+					<tbody>
+						<#if list??>
+							<#list list as item>
+								<tr id="tr_${(item.id)!}">
+									<td>${(item.id)!}</td>
+									<td>${(item.username)!}</td>
+									<td>${(item.realname)!}</td>
+									<td>${(item.company)!}</td>
+									<td>${(item.job)!}</td>
+									<td>
+										<#if (item.status)?? && ((item.status) == 1)>
+											<span class="text-green"><@spring.message 'status.enable'/></span>
+										<#else>
+											<span class="text-red"><@spring.message 'status.disable'/></span>
+										</#if>
+									</td>
+									<td><script>document.write(timeToString(${(item.time)?c}));</script></td>
+									<#if childPageMap['edit']?? || childPageMap['del']??>
+										<td>
+											<#if childPageMap['edit']??>
+												<a href="${childPageMap['edit']}/${(item.id)!}" class="btn btn-default btn-sm" style="padding: 2px 5px;"><@spring.message 'common.edit'/></a>
+											</#if>
+											<#if childPageMap['del']??>
+												<a href="javascript:void(0)" onclick="asyncDelete('${(item.id)!}', '${childPageMap['del']}')" class="btn btn-default btn-sm" style="padding: 2px 5px;"><@spring.message 'common.delete'/></a>
+											</#if>
+										</td>
+									</#if>
+								</tr>
+							</#list>
+						</#if>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

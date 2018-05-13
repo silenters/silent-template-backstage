@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<#include "include/head.html">
+<#include "include/script.html">
+<title><@spring.message 'common.logo'/> <@spring.message 'common.title'/></title>
+</head>
+<#if nav_bar_location?? && nav_bar_location == "top">
+	<#include "index_2.html">
+<#else>
+	<#include "index_1.html">
+</#if>
+<script type="text/javascript">
+Highcharts.setOptions({  
+	global: {  
+		useUTC: false//是否使用世界标准时间  
+	}  
+});
+
+var table;
+$(function() {
+	// 默认日期选择插件设置(仅获取到yyyy-mm-dd)
+	$(".default-datapicker").datetimepicker({
+        language:  'zh-CN',
+        weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 2,
+		forceParse: 0,
+		pickerPosition: "bottom-left",
+		linkField: "mirror_field",
+		format: 'yyyy-mm-dd'
+    });
+	
+	// 下拉菜单样式设置
+	$(".select2").select2({});
+	
+	// DataTable默认配置
+	var dataTableOpetion = {
+		"oLanguage": {
+			"sSearch": "搜索:",
+	        "sLengthMenu": "每页显示 _MENU_ 条记录",
+	        "sZeroRecords": "Nothing found - 没有记录",
+	        "sInfo": "显示第  _START_ 条到第  _END_ 条记录,一共  _TOTAL_ 条记录",
+	        "sInfoEmpty": "显示0条记录",
+	        "oPaginate": {
+	        	"sPrevious": " 上一页 ",
+	            "sNext":     " 下一页 ",
+	        }
+	    },
+	    "bAutoWidth":false,
+	    "bProcessing":true,
+	    "bRetrieve":true,
+	    "scrollX": true,
+	    "aLengthMenu":[[10, 20, 50, -1], [10, 20, 50, "所有"]]
+	};
+	
+	// DataTable自定义设置
+	if($.isFunction(window.createDataTableOption)) {
+	    var options = createDataTableOption();
+		if(options !== undefined) {
+			$.each(options, function(key, val){
+				dataTableOpetion[key] = val;
+			});
+		}
+	}
+	table = $("#datatable_nebula").DataTable(dataTableOpetion);
+});
+</script>
+</html>
